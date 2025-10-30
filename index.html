@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Law for Accountants (RoI) Quiz</title>
+    <title>Law for Accountants (RoI) App</title>
     <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #0056b3;
+            --light-gray: #f0f2f5;
+            --border-color: #ddd;
+            --correct-bg: #d4edda;
+            --incorrect-bg: #f8d7da;
+            --correct-text: #155724;
+            --incorrect-text: #721c24;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
+            background-color: var(--light-gray);
             color: #333;
             margin: 0;
             padding: 20px;
@@ -16,384 +26,460 @@
             align-items: center;
             min-height: 100vh;
         }
-        #app-container {
+        .container {
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 700px;
+            max-width: 800px;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        #header {
-            background-color: #003366;
+        .header {
+            background-color: var(--primary-color);
             color: white;
             padding: 20px 25px;
+            text-align: center;
         }
-        #header h1 {
+        .header h1 {
             margin: 0;
-            font-size: 1.5em;
+            font-size: 1.6em;
         }
-        #progress-bar-container {
-            width: 100%;
-            background-color: #e0e0e0;
+        .main-content {
+            padding: 30px;
         }
-        #progress-bar {
-            width: 0%;
-            height: 6px;
-            background-color: #4caf50;
-            transition: width 0.3s ease-in-out;
+        .hidden {
+            display: none;
         }
-        #quiz-container, #score-container {
-            padding: 25px;
+        /* --- Menu & Chapter Select --- */
+        .menu-container h2, .chapter-select-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .btn, .chapter-btn {
+            padding: 18px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .btn:hover, .chapter-btn:hover {
+            background-color: var(--primary-color);
+        }
+        .chapter-btn {
+            background-color: #f9f9f9;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+         .chapter-btn:hover {
+            background-color: #e9e9e9;
+        }
+
+        /* --- Quiz Screen --- */
+        #quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
         #question-number {
             font-size: 0.9em;
             font-weight: bold;
             color: #555;
-            margin-bottom: 10px;
+        }
+        #timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
         #question-text {
             font-size: 1.2em;
             margin-bottom: 20px;
-            white-space: pre-wrap; /* Keeps formatting of question text */
+            white-space: pre-wrap;
             line-height: 1.5;
         }
-        #options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
         .option-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            font-size: 1em;
-            text-align: left;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
+            display: block; width: 100%; padding: 15px; font-size: 1em; text-align: left;
+            background-color: #f9f9f9; border: 1px solid var(--border-color);
+            border-radius: 8px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s;
+            margin-bottom: 10px;
         }
-        .option-btn:hover:not(:disabled) {
-            background-color: #e9e9e9;
-            border-color: #003366;
-        }
-        .option-btn:disabled {
-            cursor: not-allowed;
-        }
-        .option-btn.correct {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-            font-weight: bold;
-        }
-        .option-btn.incorrect {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-            font-weight: bold;
-        }
-        #feedback-container {
-            margin-top: 20px;
-            font-size: 1.1em;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        #feedback-container.correct {
-            color: #155724;
-        }
-         #feedback-container.incorrect {
-            color: #721c24;
-        }
-        #next-btn, #restart-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: white;
-            background-color: #0056b3;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #next-btn:hover, #restart-btn:hover {
-            background-color: #003366;
-        }
-        .hidden {
-            display: none;
-        }
+        .option-btn:hover:not(:disabled) { background-color: #e9e9e9; border-color: var(--primary-color); }
+        .option-btn:disabled { cursor: not-allowed; }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: #c3e6cb; color: var(--correct-text); font-weight: bold; }
+        .option-btn.incorrect { background-color: var(--incorrect-bg); border-color: #f5c6cb; color: var(--incorrect-text); font-weight: bold; }
+        .option-btn.selected { border-color: var(--secondary-color); background-color: #e7f1ff; border-width: 2px; }
+        #feedback-container { margin-top: 15px; font-size: 1.1em; font-weight: bold; padding: 10px; border-radius: 5px; }
+        #feedback-container.correct { color: var(--correct-text); }
+        #feedback-container.incorrect { color: var(--incorrect-text); }
+
+        /* --- Results Screen --- */
+        #results-container h2 { text-align: center; color: var(--primary-color); }
+        #score-text { text-align: center; font-size: 1.4em; font-weight: bold; margin-bottom: 10px; }
+        #final-feedback { text-align: center; font-size: 1.1em; margin-bottom: 30px; }
+        #results-details { max-height: 400px; overflow-y: auto; border-top: 1px solid #eee; margin-top: 20px; padding-top: 20px; }
+        .result-item { border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .result-item p { margin: 0 0 10px 0; }
+        .result-item-q { font-weight: bold; white-space: pre-wrap; }
+        .result-correct { border-left: 5px solid var(--correct-text); }
+        .result-incorrect { border-left: 5px solid var(--incorrect-text); }
+        .user-answer { color: var(--incorrect-text); }
+        .correct-answer { color: var(--correct-text); }
     </style>
 </head>
 <body>
 
-    <div id="app-container">
-        <div id="header">
-            <h1>Law for Accountants (RoI) Quiz</h1>
-        </div>
-        <div id="progress-bar-container">
-            <div id="progress-bar"></div>
-        </div>
-        <div id="quiz-container">
-            <div id="question-number"></div>
-            <div id="question-text"></div>
-            <div id="options-container"></div>
-            <div id="feedback-container"></div>
-            <button id="next-btn" class="hidden">Next Question</button>
-        </div>
-        <div id="score-container" class="hidden">
-            <h2>Quiz Complete!</h2>
-            <p id="score-text"></p>
-            <p id="final-feedback"></p>
-            <button id="restart-btn">Restart Quiz</button>
+<div class="container">
+    <div class="header">
+        <h1>Law for Accountants (RoI)</h1>
+    </div>
+
+    <!-- Main Menu Screen -->
+    <div id="menu-container" class="main-content">
+        <h2>Choose Your Mode</h2>
+        <div class="btn-container">
+            <button id="practice-btn" class="btn">Practice Questions</button>
+            <button id="mock-exam-btn" class="btn">Mock Exam</button>
         </div>
     </div>
 
-    <script>
-        // --- QUIZ DATA ---
-        // I have extracted the first 20 questions. Let me know if you want the full set.
-        const quizData = [
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which two of the following terms are associated with current criminal law in Ireland?\n(1) Community Service\n(2) Pleadings\n(3) The Attorney General\n(4) Rehabilitation",
-                options: { "A": "(1) and (2)", "B": "(1) and (4)", "C": "(2) and (3)", "D": "(3) and (4)" },
-                correctAnswer: "B"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which two of the following terms are associated with civil law in Ireland?\n(1) Pleadings\n(2) Injunctions\n(3) Probation orders\n(4) Indictment",
-                options: { "A": "(1) and (2)", "B": "(2) and (3)", "C": "(3) and (4)", "D": "(1) and (4)" },
-                correctAnswer: "A"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following describes the burden of proof in civil law matters?",
-                options: { "A": "The burden is the balance of probabilities", "B": "The burden lies on the prosecution", "C": "The burden lies with the plaintiff/claimant", "D": "The burden is tested based on a belief beyond all reasonable doubt" },
-                correctAnswer: "C"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which ONE of the following describes the standard of proof in criminal law matters?",
-                options: { "A": "The standard must be proven by the plaintiff/claimant", "B": "The standard is tested based on a belief of guilt beyond all reasonable doubt", "C": "The standard is based on the balance of probabilities", "D": "The standard must be met by the prosecution" },
-                correctAnswer: "B" // Note: Solution key says B, but standard of proof is met by prosecution (D). Going by solution key. Let's assume B is the intended correct answer text.
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following is not an objective of civil law?",
-                options: { "A": "To award the injured party compensation for losses sustained from the actions of the wrongdoer", "B": "To compel the wrongdoer to cease their unwanted or prohibited actions", "C": "To compel the wrongdoer to comply with their legal obligations", "D": "To punish the wrongdoer for their unwanted or prohibited actions" },
-                correctAnswer: "D"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following is not an objective of criminal law?",
-                options: { "A": "To deter the wrongdoer from engaging in a prohibited act", "B": "To compel the wrongdoer to comply with their legal obligations", "C": "To punish the wrongdoer for their unwanted or prohibited actions", "D": "To rehabilitate the wrongdoer" },
-                correctAnswer: "B"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following remedies is not associated with criminal law in Ireland?",
-                options: { "A": "A fine", "B": "A forfeiture order", "C": "An order for specific performance", "D": "A community service order" },
-                correctAnswer: "C"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following remedies is not associated with civil law in Ireland?",
-                options: { "A": "Damages", "B": "An account for profits", "C": "A compensation order", "D": "An injunction" },
-                correctAnswer: "C"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following areas of law is not classed as private law?",
-                options: { "A": "Constitutional law", "B": "Company law", "C": "Criminal law", "D": "Law of torts" },
-                correctAnswer: "C"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following is not a party in a civil action?",
-                options: { "A": "The prosecution", "B": "The plaintiff", "C": "The respondent", "D": "The appellant" },
-                correctAnswer: "A"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following is not a potential outcome/finding in a criminal case?",
-                options: { "A": "Guilty", "B": "Not guilty", "C": "Not guilty by reason of insanity", "D": "Liable" },
-                correctAnswer: "D"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which TWO of the following cases involve civil claims?\n(1) People v. Ryan (1957)\n(2) Attorney General v. Shannon (2018)\n(3) DPP v. Murphy (1999)\n(4) Kennedy v. Ireland (2013)",
-                options: { "A": "(1) and (2)", "B": "(2) and (3)", "C": "(2) and (4)", "D": "(3) and (4)" },
-                correctAnswer: "C"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "From which of the following does common law originate?",
-                options: { "A": "The law of equity", "B": "Local law-making", "C": "The Parliament", "D": "The Constitution" },
-                correctAnswer: "B" // Solution key says B. Common law originates from judicial decisions/precedent, which historically evolved from local customs.
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "In the context of the development of the law of equity, which one of the following statements is false?",
-                options: { "A": "The law of equity was developed to prevent powerful defendants using their resources to pervert the course of justice", "B": "The law of equity was developed as judge’s common law decisions were simply ignored", "C": "The law of equity was introduced to provide a remedy where damages are ineffective", "D": "The law of equity was introduced into Ireland following the Norman conquest" },
-                correctAnswer: "D"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following statements is true?",
-                options: { "A": "Where there is a conflict between common law and equity, statute law applies", "B": "Where there is a conflict between common law and equity, constitutional law applies", "C": "Where there is a conflict between common law and equity, common law prevails", "D": "Where there is a conflict between common law and equity, equity prevails" },
-                correctAnswer: "D"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following terms relates to a type of binding precedent that must be followed?",
-                options: { "A": "Authoritative precedent", "B": "Declaratory precedent", "C": "Influential precedent", "D": "Persuasive precedent" },
-                correctAnswer: "A"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "A judge dealing with the law regarding the liability of a solicitor to a beneficiary of a will decides not to apply a precedent regarding the liability of a solicitor to a beneficiary of a trust, as he considers that the cases are sufficiently different for the precedent not to automatically apply. This is an example of which of the following?",
-                options: { "A": "Reserving the precedent", "B": "Reversing the precedent", "C": "Distinguishing the precedent", "D": "Overturning the precedent" },
-                correctAnswer: "C"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "Which one of the following creates a binding precedent that must be followed by all other Courts?",
-                options: { "A": "An obiter dictum statement of the Supreme Court", "B": "An obiter dictum statement of the High Court", "C": "A ratio decidendi statement of the Supreme Court", "D": "A ratio decidendi statement of the High Court" },
-                correctAnswer: "C"
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "The Supreme Court is dealing with a case regarding insider trading that has been appealed from the High Court... The Supreme Court believes that the High Court’s interpretation of the law was incorrect and has decided not to follow its precedent. This is an example of which of the following?",
-                options: { "A": "Distinguishing the precedent", "B": "Overturning the precedent", "C": "Reversing the precedent", "D": "Reserving the precedent" },
-                correctAnswer: "C" // Reversing is on appeal, Overturning is a later case. The question says "appealed from the High Court".
-            },
-            {
-                section: "1. Introduction to Law",
-                questionText: "The Supreme Court created a precedent in 1998... a recent hearing of the Supreme Court decided that this meaning was too broad and changed the precedent by narrowing the definition of the term. This is an example of which of the following?",
-                options: { "A": "Reserving the precedent", "B": "Reversing the precedent", "C": "Overturning the precedent", "D": "Distinguishing the precedent" },
-                correctAnswer: "C"
-            }
-        ];
+    <!-- Chapter Select Screen -->
+    <div id="chapter-select-container" class="main-content hidden">
+        <h2>Select a Chapter</h2>
+        <div id="chapter-list" class="btn-container"></div>
+        <button id="back-to-menu-btn" class="btn" style="background-color: #6c757d; margin-top: 15px;">Back to Menu</button>
+    </div>
 
-        // --- APP LOGIC ---
-        const quizContainer = document.getElementById('quiz-container');
-        const scoreContainer = document.getElementById('score-container');
-        const questionNumberEl = document.getElementById('question-number');
-        const questionTextEl = document.getElementById('question-text');
-        const optionsContainerEl = document.getElementById('options-container');
-        const feedbackContainerEl = document.getElementById('feedback-container');
-        const nextBtn = document.getElementById('next-btn');
-        const restartBtn = document.getElementById('restart-btn');
-        const scoreTextEl = document.getElementById('score-text');
-        const finalFeedbackEl = document.getElementById('final-feedback');
-        const progressBar = document.getElementById('progress-bar');
+    <!-- Quiz Screen -->
+    <div id="quiz-container" class="main-content hidden">
+        <div id="quiz-header">
+            <div id="question-number"></div>
+            <div id="timer" class="hidden"></div>
+        </div>
+        <div id="question-text"></div>
+        <div id="options-container"></div>
+        <div id="feedback-container"></div>
+        <button id="next-btn" class="btn">Next</button>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-container" class="main-content hidden">
+        <h2>Quiz Complete!</h2>
+        <p id="score-text"></p>
+        <p id="final-feedback"></p>
+        <div id="results-details"></div>
+        <button id="menu-return-btn" class="btn">Back to Main Menu</button>
+    </div>
+</div>
+
+<script>
+    // --- FULL QUIZ DATA FOR SECTION 1 ---
+    const quizData = [
+        { section: "1. Introduction to Law", id: 1, questionText: "Which two of the following terms are associated with current criminal law in Ireland?\n(1) Community Service\n(2) Pleadings\n(3) The Attorney General\n(4) Rehabilitation", options: { A: "(1) and (2)", B: "(1) and (4)", C: "(2) and (3)", D: "(3) and (4)" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 2, questionText: "Which two of the following terms are associated with civil law in Ireland?\n(1) Pleadings\n(2) Injunctions\n(3) Probation orders\n(4) Indictment", options: { A: "(1) and (2)", B: "(2) and (3)", C: "(3) and (4)", D: "(1) and (4)" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 3, questionText: "Which one of the following describes the burden of proof in civil law matters?", options: { A: "The burden is the balance of probabilities", B: "The burden lies on the prosecution", C: "The burden lies with the plaintiff/claimant", D: "The burden is tested based on a belief beyond all reasonable doubt" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 4, questionText: "Which ONE of the following describes the standard of proof in criminal law matters?", options: { A: "The standard must be proven by the plaintiff/claimant", B: "The standard is tested based on a belief of guilt beyond all reasonable doubt", C: "The standard is based on the balance of probabilities", D: "The standard must be met by the prosecution" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 5, questionText: "Which one of the following is not an objective of civil law?", options: { A: "To award the injured party compensation for losses sustained from the actions of the wrongdoer", B: "To compel the wrongdoer to cease their unwanted or prohibited actions", C: "To compel the wrongdoer to comply with their legal obligations", D: "To punish the wrongdoer for their unwanted or prohibited actions" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 6, questionText: "Which one of the following is not an objective of criminal law?", options: { A: "To deter the wrongdoer from engaging in a prohibited act", B: "To compel the wrongdoer to comply with their legal obligations", C: "To punish the wrongdoer for their unwanted or prohibited actions", D: "To rehabilitate the wrongdoer" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 7, questionText: "Which one of the following remedies is not associated with criminal law in Ireland?", options: { A: "A fine", B: "A forfeiture order", C: "An order for specific performance", D: "A community service order" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 8, questionText: "Which one of the following remedies is not associated with civil law in Ireland?", options: { A: "Damages", B: "An account for profits", C: "A compensation order", D: "An injunction" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 9, questionText: "Which one of the following areas of law is not classed as private law?", options: { A: "Constitutional law", B: "Company law", C: "Criminal law", D: "Law of torts" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 10, questionText: "Which one of the following is not a party in a civil action?", options: { A: "The prosecution", B: "The plaintiff", C: "The respondent", D: "The appellant" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 11, questionText: "Which one of the following is not a potential outcome/finding in a criminal case?", options: { A: "Guilty", B: "Not guilty", C: "Not guilty by reason of insanity", D: "Liable" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 12, questionText: "Which TWO of the following cases involve civil claims?\n(1) People v. Ryan (1957)\n(2) Attorney General v. Shannon (2018)\n(3) DPP v. Murphy (1999)\n(4) Kennedy v. Ireland (2013)", options: { A: "(1) and (2)", B: "(2) and (3)", C: "(2) and (4)", D: "(3) and (4)" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 13, questionText: "From which of the following does common law originate?", options: { A: "The law of equity", B: "Local law-making", C: "The Parliament", D: "The Constitution" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 14, questionText: "In the context of the development of the law of equity, which one of the following statements is false?", options: { A: "The law of equity was developed to prevent powerful defendants using their resources to pervert the course of justice", B: "The law of equity was developed as judge’s common law decisions were simply ignored", C: "The law of equity was introduced to provide a remedy where damages are ineffective", D: "The law of equity was introduced into Ireland following the Norman conquest" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 15, questionText: "Which one of the following statements is true?", options: { A: "Where there is a conflict between common law and equity, statute law applies", B: "Where there is a conflict between common law and equity, constitutional law applies", C: "Where there is a conflict between common law and equity, common law prevails", D: "Where there is a conflict between common law and equity, equity prevails" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 16, questionText: "Which one of the following terms relates to a type of binding precedent that must be followed?", options: { A: "Authoritative precedent", B: "Declaratory precedent", C: "Influential precedent", D: "Persuasive precedent" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 17, questionText: "A judge dealing with the law regarding the liability of a solicitor to a beneficiary of a will decides not to apply a precedent regarding the liability of a solicitor to a beneficiary of a trust, as he considers that the cases are sufficiently different for the precedent not to automatically apply. This is an example of which of the following?", options: { A: "Reserving the precedent", B: "Reversing the precedent", C: "Distinguishing the precedent", D: "Overturning the precedent" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 18, questionText: "Which one of the following creates a binding precedent that must be followed by all other Courts?", options: { A: "An obiter dictum statement of the Supreme Court", B: "An obiter dictum statement of the High Court", C: "A ratio decidendi statement of the Supreme Court", D: "A ratio decidendi statement of the High Court" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 19, questionText: "The Supreme Court is dealing with a case regarding insider trading that has been appealed from the High Court, wherein the appellant is challenging the High Court’s interpretation of the words “precise information that a reasonable investor would use as part of their investment decision”. The Supreme Court believes that the High Court’s interpretation of the law was incorrect and has decided not to follow its precedent. This is an example of which of the following?", options: { A: "Distinguishing the precedent", B: "Overturning the precedent", C: "Reversing the precedent", D: "Reserving the precedent" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 20, questionText: "The Supreme Court created a precedent in 1998 regarding the meaning of the term “reasonable suspicion” for the purpose of the law on money laundering. However, a recent hearing of the Supreme Court decided that this meaning was too broad and changed the precedent by narrowing the definition of the term. This is an example of which of the following?", options: { A: "Reserving the precedent", B: "Reversing the precedent", C: "Overturning the precedent", D: "Distinguishing the precedent" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 21, questionText: "In relation to the law regarding precedent, which one of the following is not an interpretation of the rule of stare decisis?", options: { A: "The decision of a higher court stands over and binds the decision of a lower court", B: "Courts must adhere to the principles established in earlier cases", C: "A previous judgment can justify a decision in a case involving a similar set of facts", D: "Every statement made by a judge in their ruling creates a binding precedent in relation to that area of law" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 22, questionText: "Which of the following is not a prerequisite to the application of the law of precedent?", options: { A: "A hierarchical court structure", B: "Separation of powers within the State", C: "A proper system of judicial reporting", D: "Acceptance by the legal community" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 23, questionText: "Which one of the following is not a rule of precedent?", options: { A: "A decision made per incuriam has binding authority", B: "Decisions of higher courts bind the decisions of lower courts", C: "Decisions of foreign courts are not binding but can be persuasive authority", D: "The Supreme Court is not bound by its own decisions" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 24, questionText: "Which one of the following is not an advantage of the doctrine of precedent?", options: { A: "It constrains judicial decisions", B: "Consistency of decision making", C: "Fairness of decision making", D: "It provides legal clarity, by eliminating objectivity and bias" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 25, questionText: "The doctrine of separation of powers is enshrined in the Irish Constitution and the Parliament (Oireachtas) has been given legislative powers under this Constitution. Which one of the following organs of State does not form part of the composition of the Irish Parliament?", options: { A: "Dail Éireann", B: "Seanad Éireann", C: "The Cabinet", D: "The President" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 26, questionText: "Which one of the following organs of State, established by the Irish Constitution, is responsible for the interpretation and application of the law?", options: { A: "The Executive", B: "The Judicial", C: "The Legislative", D: "The President" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 27, questionText: "Which one of the following statements regarding constitutional rights is true?", options: { A: "Constitutional rights are absolute and cannot be limited", B: "All constitutional rights are directly stated in the Irish Constitution", C: "Constitutional rights only apply to Irish citizens", D: "Any unlawful encroachment upon a person’s constitutional rights is actionable before the courts" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 28, questionText: "Which one of the following is the final appellate court to hear a case regarding an alleged breach of a person’s right to fair procedures?", options: { A: "The High Court", B: "The Court of Appeal", C: "The European Court of Human Rights", D: "The Supreme Court" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 29, questionText: "In relation to the European Court and Convention on Human Rights, which one of the following statements is false?", options: { A: "Cases can only be brought to this Court on appeal from the Supreme Court", B: "Decisions of the Court were not directly binding in Ireland until the enactment of the European Convention on Human Rights Act 2003", C: "National courts have the authority to declare Irish legislation invalid if it contravenes the Convention", D: "A declaration of incompatibility with the European Convention on Human Rights by the Court may result in an ex-gratia payment of compensation to a party to the proceeding" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 30, questionText: "Which two of the following statements are correct?\n(1) Where there is a conflict between Irish law and EU law, EU law prevails\n(2) Where there is a conflict between Irish law and EU law, Irish law prevails\n(3) The European Convention on Human Rights is subordinate to Irish law\n(4) Irish law is subordinate to the European Convention on Human Rights", options: { A: "(1) and (3)", B: "(1) and (4)", C: "(2) and (3)", D: "(2) and (4)" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 31, questionText: "Which one of the following is classified as the primary source of European Union law?", options: { A: "EU Regulations", B: "EU Directives", C: "The EU Treaties", D: "Decisions of the European Court of Justice" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 32, questionText: "A piece of EU legislation that has general application, is binding in its entirety and is directly applicable in the Member States is known as which of the following:", options: { A: "A recommendation of the European Commission", B: "An opinion of the European Commission", C: "An EU Directive", D: "An EU Regulation" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 33, questionText: "A piece of EU legislation that is binding as to the result to be achieved and that the Member States must adopt by their own method of implementation is known as which of the following:", options: { A: "An EU Directive", B: "An EU Regulation", C: "A recommendation of the European Commission", D: "An opinion of the European Commission" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 34, questionText: "Which ONE of the following EU institutions represents EU’s citizens and is directly elected by them?", options: { A: "The European Commission", B: "The European Parliament", C: "The Council of the European Union", D: "The Court of Justice of the European Union" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 35, questionText: "Which one of the following EU institutions is responsible for drafting proposals for new European laws, as well as managing the day-to-day business of implementing EU policies and spending EU funds?", options: { A: "The Council of the European Union", B: "The European Commission", C: "The European Parliament", D: "The Court of Justice of the European Union" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 36, questionText: "Which one of the following sources of EU law is merely persuasive and not binding?", options: { A: "A Decision", B: "A Recommendation", C: "A Regulation", D: "A Directive" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 37, questionText: "Which two of the following are not examples of primary legislation?\n(1) The Health Insurance (Amendment) Act 2018\n(2) The Companies Act 2014\n(3) The Companies (Statutory Audits) Act 2018 (Commencement) Order 2018\n(4) The Safety, Health and Welfare at Work (General Application) (Amendment) Regulations 2012", options: { A: "(1) and (2)", B: "(2) and (3)", C: "(3) and (4)", D: "(1) and (4)" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 38, questionText: "Which one of the following is not an example of delegated legislation?", options: { A: "The Companies Act 2014 (Forms) Regulations 2018", B: "The Road Traffic Act 2002 (Commencement of Certain Provisions) (Penalty Points) Order 2012", C: "The Withdrawal of the United Kingdom from the European Union (Consequential Provisions) Bill 2019", D: "Dublin City Council (Prohibition of Consumption of Intoxicating Liquor on Roads and in Public Places) Bye-Laws 2008" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 39, questionText: "Which one of the following statements is false in relation to delegated legislation?", options: { A: "Delegated laws are laws made by a delegated authority under powers bestowed upon them by primary legislation", B: "Delegated laws are absolute and are not open to challenge", C: "Delegated laws are limited, in that they can only give effect to the principles and policies of the primary legislation", D: "Delegated authority must be exercised in a manner that is reasonable, just and fair" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 40, questionText: "Which one of the following is a disadvantage of delegated legislation?", options: { A: "It can respond on an ad hoc basis to problems or issues that arise", B: "The Oireachtas does not have sufficient expertise to enact highly specialised and technical laws", C: "Delegated legislation facilitates changes in the law without having to undergo the debating process of the Oireachtas", D: "It takes law making away from democratically elected persons, into the hands of civil servants" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 41, questionText: "Which of the following is/are empowered to create delegated legislation?\n(1) Professional bodies, such as Chartered Accountants Ireland\n(2) Government Ministers, such as the Minister for Health\n(3) Specialist bodies, such as Trinity College Dublin (TCD)\n(4) Local authorities, such as Limerick City and County Council", options: { A: "(1) only", B: "(1) and (2)", C: "(1), (2) and (3)", D: "All of them" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 42, questionText: "Which one of the following is an example of a type of delegated legislation that involves a single exercise of delegated power that is administrative in nature?", options: { A: "A Ministerial Regulation", B: "A Ministerial Order", C: "A Bye-Law", D: "A Scheme" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 43, questionText: "Which two of the following statements are true?\n(1) All delegated legislation must be published\n(2) Delegated legislation may be challenged on the basis that the delegated body has exceeded their authority and acted ultra vires\n(3) Delegated legislation can never be used to change, amend or repeal the law\n(4) Schemes are a form of delegated legislation that elaborate or explain matters contained in the primary legislation", options: { A: "(1) and (2)", B: "(1) and (3)", C: "(2) and (3)", D: "(2) and (4)" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 44, questionText: "In the context of delegated legislation, which one of the following statements is false?", options: { A: "The Oireachtas will not delegate the power to raise taxes to a Government Minister", B: "The Oireachtas will not delegate power that undermines the jurisdiction of the Courts", C: "The Oireachtas will not delegate power that facilitates the imposition of sanctions (such as a fine) for breach of that legislation", D: "The Oireachtas will not delegate the power that encroaches upon a person’s liberty or constitutional rights" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 45, questionText: "Andrew was recently sued for nuisance... If the court decides that Andrew has not breached this Act, as llamas are not farm animals, this is an example of which method of statutory interpretation?", options: { A: "Literal Rule", B: "Golden Rule", C: "Mischief Rule", D: "Purposive Approach" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 46, questionText: "Regarding statutory interpretation, which one of the following statements is false?", options: { A: "Statutory interpretation facilitates interpreting words in context", B: "Statutory interpretation is necessary where the words of the statute are ambiguous or uncertain", C: "The rules of statutory interpretation (literal, golden and mischief rules) have themselves been created by statute", D: "Statutory interpretation cannot result in a law or legal provision being interpreted to have retrospective effect" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 47, questionText: "Mike was a victim of a workplace accident... and is suing for €68,000 in compensation. Which one of the following courts has jurisdiction to hear Mike’s claim?", options: { A: "The Circuit Court", B: "The District Court", C: "The High Court", D: "The Supreme Court" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 48, questionText: "Amanda’s sole trading business recently closed with debts in excess of €1.2 million... Which one of the following courts has jurisdiction to hear an application for bankruptcy?", options: { A: "The High Court", B: "The Supreme Court", C: "The District Court", D: "The Circuit Court" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 49, questionText: "Some months ago, Mark hired a builder to lay a patio and build a pizza oven in his garden... Which one of the following courts has jurisdiction to hear this breach of contract claim?", options: { A: "The Circuit Court", B: "The High Court", C: "The Supreme Court", D: "The District Court" }, correctAnswer: "D" },
+        { section: "1. Introduction to Law", id: 50, questionText: "Jennifer and Ben have been separated for the past 10 years... Which one of the following courts has jurisdiction to hear this application for a non-contested divorce?", options: { A: "The Circuit Court", B: "The High Court", C: "The District Court", D: "The Supreme Court" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 51, questionText: "Which one of the following courts has jurisdiction to hear a referral under Article 26 of the Constitution to ascertain the constitutionality or otherwise of a Bill presented to the President for signature?", options: { A: "The District Court", B: "The Supreme Court", C: "The Circuit Court", D: "The High Court" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 52, questionText: "Which one of the following cases does the Commercial Court, a division of the High Court, not have the jurisdiction to adjudicate?", options: { A: "Proceedings under the Arbitration Act 2010 with a value of at least €1 million", B: "All disputes of a commercial nature between commercial bodies, where the value of the claim exceeds €0.5 million", C: "Disputes concerning intellectual property", D: "Proceedings for relief in respect of passing off" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 53, questionText: "In the context of criminal law, in which two of the following courts will the accused be entitled to a jury trial?\n(1) The District Criminal Court\n(2) The Special Criminal Court\n(3) The Circuit Criminal Court\n(4) The Central Criminal Court", options: { A: "(1) and (2)", B: "(2) and (3)", C: "(3) and (4)", D: "(1) and (4)" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 54, questionText: "Graeme has recently received a summons to appear in court on a criminal charge of public intoxication... In which one of the following criminal courts is this case likely to be heard?", options: { A: "The Central Criminal Court", B: "The District Criminal Court", C: "The Circuit Criminal Court", D: "The Special Criminal Court" }, correctAnswer: "B" },
+        { section: "1. Introduction to Law", id: 55, questionText: "Which one of the following criminal courts has the jurisdiction to hear a case involving a charge of murder?", options: { A: "The District Criminal Court", B: "The Circuit Criminal Court", C: "The Central Criminal Court", D: "The Special Criminal Court" }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 56, questionText: "In the context of the Special Criminal Court, which one of the following statements is false?", options: { A: "An appeal against conviction or sentence can be taken to the Supreme Court", B: "This is a non-permanent court...", C: "This court is comprised of three judges...", D: "This court has the jurisdiction to hear scheduled offences..." }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 57, questionText: "In relation to the Court of Appeal, which one of the following statements is false?", options: { A: "It has exclusive jurisdiction to hear civil law appeals from the High Court", B: "It has jurisdiction to hear questions of law submitted by the Circuit Court", C: "It can hear appeals from the Circuit Criminal Court, Central Criminal Court and Special Criminal Court", D: "Cases are normally heard before three judges" }, correctAnswer: "A" },
+        { section: "1. Introduction to Law", id: 58, questionText: "Which one of the following is true regarding alternate methods of dispute resolution?", options: { A: "The advantage of arbitration is that it is private, whereas mediation takes place in a public forum", B: "Once a dispute is referred to arbitration or mediation, the parties cannot withdraw...", C: "The parties are bound by the decision of the arbitrator, whereas they are not bound by the decision of the mediator...", D: "The role of both the arbitrator and mediator is to listen to both sides..." }, correctAnswer: "C" },
+        { section: "1. Introduction to Law", id: 59, questionText: "Which one of the following is not an advantage of referring a dispute to arbitration versus bringing proceedings before a traditional court?", options: { A: "Both parties share the costs of the arbitrator and the venue", B: "The arbitrator is usually an expert...", C: "Arbitration hearings are usually held in private", D: "Arbitration hearings are normally more time efficient" }, correctAnswer: "A" },
+    ];
+    
+    // --- APP STATE & DOM ELEMENTS ---
+    const MOCK_EXAM_QUESTION_COUNT = 50;
+    const MOCK_EXAM_DURATION_MINUTES = 90;
+
+    let currentMode = ''; // 'practice' or 'mock'
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let activeQuestions = [];
+    let timerInterval;
+
+    const menuContainer = document.getElementById('menu-container');
+    const chapterSelectContainer = document.getElementById('chapter-select-container');
+    const quizContainer = document.getElementById('quiz-container');
+    const resultsContainer = document.getElementById('results-container');
+    // ... all other getElementById calls
+    const chapterListEl = document.getElementById('chapter-list');
+    const questionNumberEl = document.getElementById('question-number');
+    const timerEl = document.getElementById('timer');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainerEl = document.getElementById('options-container');
+    const feedbackContainerEl = document.getElementById('feedback-container');
+    const nextBtn = document.getElementById('next-btn');
+    const scoreTextEl = document.getElementById('score-text');
+    const finalFeedbackEl = document.getElementById('final-feedback');
+    const resultsDetailsEl = document.getElementById('results-details');
+
+    // --- EVENT LISTENERS ---
+    document.getElementById('practice-btn').addEventListener('click', showChapterSelection);
+    document.getElementById('mock-exam-btn').addEventListener('click', startMockExam);
+    document.getElementById('back-to-menu-btn').addEventListener('click', showMenu);
+    document.getElementById('menu-return-btn').addEventListener('click', showMenu);
+    nextBtn.addEventListener('click', handleNextClick);
+
+    // --- FUNCTIONS ---
+    function showScreen(screen) {
+        [menuContainer, chapterSelectContainer, quizContainer, resultsContainer].forEach(container => {
+            container.classList.add('hidden');
+        });
+        screen.classList.remove('hidden');
+    }
+
+    function showMenu() {
+        showScreen(menuContainer);
+    }
+
+    function showChapterSelection() {
+        chapterListEl.innerHTML = ''; // Clear previous list
+        const chapters = [...new Set(quizData.map(q => q.section))];
+        chapters.forEach(chapter => {
+            const button = document.createElement('button');
+            button.innerText = chapter;
+            button.classList.add('chapter-btn');
+            button.addEventListener('click', () => startPractice(chapter));
+            chapterListEl.appendChild(button);
+        });
+        showScreen(chapterSelectContainer);
+    }
+
+    function startPractice(chapterName) {
+        currentMode = 'practice';
+        const chapterQuestions = quizData.filter(q => q.section === chapterName);
+        startQuiz(chapterQuestions);
+    }
+
+    function startMockExam() {
+        currentMode = 'mock';
+        const shuffled = [...quizData].sort(() => 0.5 - Math.random());
+        const mockQuestions = shuffled.slice(0, MOCK_EXAM_QUESTION_COUNT);
+        startQuiz(mockQuestions);
+        startTimer(MOCK_EXAM_DURATION_MINUTES * 60);
+    }
+
+    function startQuiz(questions) {
+        activeQuestions = questions.map(q => ({...q, userAnswer: null})); // Add userAnswer tracker
+        currentQuestionIndex = 0;
+        score = 0;
+        showScreen(quizContainer);
+        displayQuestion();
+    }
+
+    function displayQuestion() {
+        resetQuestionState();
+        const question = activeQuestions[currentQuestionIndex];
         
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let questions = [];
+        questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
+        questionTextEl.innerText = question.questionText;
 
-        function startQuiz() {
-            // Shuffle questions to make it interesting
-            questions = [...quizData].sort(() => Math.random() - 0.5);
-            currentQuestionIndex = 0;
-            score = 0;
-            scoreContainer.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            nextBtn.classList.add('hidden');
-            showQuestion();
-        }
-
-        function showQuestion() {
-            resetState();
-            const currentQuestion = questions[currentQuestionIndex];
-            const progressPercentage = ((currentQuestionIndex) / questions.length) * 100;
-            progressBar.style.width = `${progressPercentage}%`;
-
-            questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-            questionTextEl.innerText = currentQuestion.questionText;
-
-            Object.entries(currentQuestion.options).forEach(([key, value]) => {
-                const button = document.createElement('button');
-                button.innerText = `${key}. ${value}`;
-                button.classList.add('option-btn');
-                button.addEventListener('click', () => selectAnswer(key, button));
-                optionsContainerEl.appendChild(button);
-            });
-        }
-
-        function resetState() {
-            feedbackContainerEl.innerText = "";
-            feedbackContainerEl.className = 'feedback-container';
-            nextBtn.classList.add('hidden');
-            while (optionsContainerEl.firstChild) {
-                optionsContainerEl.removeChild(optionsContainerEl.firstChild);
-            }
+        for (const [key, value] of Object.entries(question.options)) {
+            const button = document.createElement('button');
+            button.innerText = `${key}. ${value}`;
+            button.classList.add('option-btn');
+            button.dataset.key = key;
+            button.addEventListener('click', () => handleAnswer(key, button));
+            optionsContainerEl.appendChild(button);
         }
         
-        function selectAnswer(selectedKey, selectedButton) {
-            const currentQuestion = questions[currentQuestionIndex];
-            const isCorrect = selectedKey === currentQuestion.correctAnswer;
+        if (currentMode === 'mock') {
+            nextBtn.classList.remove('hidden'); // Next button is always visible in mock
+        }
+    }
 
+    function resetQuestionState() {
+        optionsContainerEl.innerHTML = '';
+        feedbackContainerEl.innerHTML = '';
+        feedbackContainerEl.className = 'feedback-container';
+        nextBtn.classList.add('hidden');
+    }
+
+    function handleAnswer(selectedKey, button) {
+        activeQuestions[currentQuestionIndex].userAnswer = selectedKey;
+
+        if (currentMode === 'practice') {
+            const isCorrect = selectedKey === activeQuestions[currentQuestionIndex].correctAnswer;
             if (isCorrect) {
                 score++;
-                feedbackContainerEl.innerText = "Correct!";
+                feedbackContainerEl.innerText = 'Correct!';
                 feedbackContainerEl.classList.add('correct');
             } else {
-                feedbackContainerEl.innerText = `Incorrect. The correct answer is ${currentQuestion.correctAnswer}.`;
+                feedbackContainerEl.innerText = `Incorrect. The correct answer is ${activeQuestions[currentQuestionIndex].correctAnswer}.`;
                 feedbackContainerEl.classList.add('incorrect');
             }
-
-            Array.from(optionsContainerEl.children).forEach(button => {
-                const optionKey = button.innerText.split('.')[0];
-                if (optionKey === currentQuestion.correctAnswer) {
-                    button.classList.add('correct');
-                } else {
-                     button.classList.add('incorrect');
+            // Visually mark all options
+            Array.from(optionsContainerEl.children).forEach(btn => {
+                if (btn.dataset.key === activeQuestions[currentQuestionIndex].correctAnswer) {
+                    btn.classList.add('correct');
+                } else if(btn.dataset.key === selectedKey) {
+                    btn.classList.add('incorrect');
                 }
-                button.disabled = true;
+                btn.disabled = true;
             });
-            
             nextBtn.classList.remove('hidden');
+        } else { // Mock mode
+            // Just highlight the selected answer
+            Array.from(optionsContainerEl.children).forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+        }
+    }
+    
+    function handleNextClick() {
+        if (currentMode === 'mock' && activeQuestions[currentQuestionIndex].userAnswer === null) {
+            // Optional: prevent moving on without an answer
+            // alert("Please select an answer.");
+            // return;
         }
 
-        function showScore() {
-            quizContainer.classList.add('hidden');
-            scoreContainer.classList.remove('hidden');
-            progressBar.style.width = '100%';
-            
-            const scorePercent = Math.round((score / questions.length) * 100);
-            scoreTextEl.innerText = `Your score: ${score} out of ${questions.length} (${scorePercent}%)`;
-
-            let feedback = "";
-            if (scorePercent === 100) {
-                feedback = "Excellent! You aced it!";
-            } else if (scorePercent >= 80) {
-                feedback = "Great job! You know your stuff.";
-            } else if (scorePercent >= 50) {
-                feedback = "Good effort! Keep practicing to improve.";
-            } else {
-                feedback = "Keep trying! Review the material and take the quiz again.";
-            }
-            finalFeedbackEl.innerText = feedback;
+        currentQuestionIndex++;
+        if (currentQuestionIndex < activeQuestions.length) {
+            displayQuestion();
+        } else {
+            showResults();
         }
+    }
 
-        nextBtn.addEventListener('click', () => {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
-            } else {
-                showScore();
+    function startTimer(duration) {
+        timerEl.classList.remove('hidden');
+        let timer = duration;
+        let minutes, seconds;
+        
+        timerInterval = setInterval(() => {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            timerEl.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                clearInterval(timerInterval);
+                showResults();
             }
-        });
+            if(timer < 60) { // Make timer red in the last minute
+                timerEl.style.color = 'var(--incorrect-text)';
+            }
+        }, 1000);
+    }
+    
+    function showResults() {
+        clearInterval(timerInterval);
+        timerEl.classList.add('hidden');
+        timerEl.style.color = 'var(--primary-color)'; // Reset color
 
-        restartBtn.addEventListener('click', startQuiz);
+        // Calculate score for mock exam now
+        if(currentMode === 'mock') {
+            score = 0;
+            activeQuestions.forEach(q => {
+                if(q.userAnswer === q.correctAnswer) {
+                    score++;
+                }
+            });
+        }
+        
+        showScreen(resultsContainer);
+        
+        const scorePercent = Math.round((score / activeQuestions.length) * 100);
+        scoreTextEl.innerText = `Your Score: ${score} out of ${activeQuestions.length} (${scorePercent}%)`;
+        finalFeedbackEl.innerText = scorePercent >= 50 ? "Congratulations, you passed!" : "Keep practicing, you'll get there!";
+        
+        // Show detailed results for mock exam
+        resultsDetailsEl.innerHTML = '';
+        if (currentMode === 'mock') {
+            activeQuestions.forEach((question, index) => {
+                const isCorrect = question.userAnswer === question.correctAnswer;
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('result-item', isCorrect ? 'result-correct' : 'result-incorrect');
+                
+                let answerDetails = '';
+                if (!isCorrect) {
+                    const userAnswerText = question.userAnswer ? `${question.userAnswer}. ${question.options[question.userAnswer]}` : 'Not answered';
+                    const correctAnswerText = `${question.correctAnswer}. ${question.options[question.correctAnswer]}`;
+                    answerDetails = `
+                        <p>Your answer: <span class="user-answer">${userAnswerText}</span></p>
+                        <p>Correct answer: <span class="correct-answer">${correctAnswerText}</span></p>
+                    `;
+                }
 
-        // Start the quiz when the page loads
-        startQuiz();
-    </script>
+                resultItem.innerHTML = `
+                    <p><b>Question ${index + 1}: ${isCorrect ? 'Correct' : 'Incorrect'}</b></p>
+                    <p class="result-item-q">${question.questionText}</p>
+                    ${answerDetails}
+                `;
+                resultsDetailsEl.appendChild(resultItem);
+            });
+        }
+    }
+
+    // Initial load
+    showMenu();
+</script>
+
 </body>
 </html>
