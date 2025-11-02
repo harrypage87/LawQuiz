@@ -1102,29 +1102,27 @@
     }
 
     function displayQuestion() {
-        resetQuestionState();
-        const question = activeQuestions[currentQuestionIndex];
-        
-        questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
-        questionTextEl.innerText = question.questionText;
+    resetQuestionState();
+    const question = activeQuestions[currentQuestionIndex];
+    
+    questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
+    questionTextEl.innerText = question.questionText;
 
-        // Create option buttons from the new data structure
-        const optionLabels = ['A', 'B', 'C', 'D'];
-        question.options.forEach((optionText, index) => {
-            const key = optionLabels[index];
-            const button = document.createElement('button');
-            button.innerText = `${key}. ${optionText}`;
-            button.classList.add('option-btn');
-            button.dataset.key = key;
-            button.addEventListener('click', () => handleAnswer(key, button));
-            optionsContainerEl.appendChild(button);
-        });
-        
-        if (currentMode === 'mock') {
-            nextBtn.classList.remove('hidden');
-        }
+    const optionLabels = ['A', 'B', 'C', 'D'];
+    question.options.forEach((optionText, index) => {
+        const key = optionLabels[index];
+        const button = document.createElement('button');
+        button.innerText = `${key}. ${optionText}`;
+        button.classList.add('option-btn');
+        button.dataset.key = key; // Set the key to 'A', 'B', etc.
+        button.addEventListener('click', () => handleAnswer(key, button));
+        optionsContainerEl.appendChild(button);
+    });
+    
+    if (currentMode === 'mock') {
+        nextBtn.classList.remove('hidden');
     }
-
+}
     function resetQuestionState() {
         optionsContainerEl.innerHTML = '';
         feedbackContainerEl.innerHTML = '';
@@ -1133,33 +1131,33 @@
     }
 
     function handleAnswer(selectedKey, button) {
-        const correctKey = ['A', 'B', 'C', 'D'][activeQuestions[currentQuestionIndex].correctAnswer];
-        activeQuestions[currentQuestionIndex].userAnswer = selectedKey;
+    const correctKey = ['A', 'B', 'C', 'D'][activeQuestions[currentQuestionIndex].correctAnswer];
+    activeQuestions[currentQuestionIndex].userAnswer = selectedKey;
 
-        if (currentMode === 'practice') {
-            const isCorrect = selectedKey === correctKey;
-            if (isCorrect) {
-                score++;
-                feedbackContainerEl.innerText = 'Correct!';
-                feedbackContainerEl.classList.add('correct');
-            } else {
-                feedbackContainerEl.innerText = `Incorrect. The correct answer is ${correctKey}.`;
-                feedbackContainerEl.classList.add('incorrect');
-            }
-            Array.from(optionsContainerEl.children).forEach(btn => {
-                if (btn.dataset.key === correctKey) {
-                    btn.classList.add('correct');
-                } else if(btn.dataset.key === selectedKey) {
-                    btn.classList.add('incorrect');
-                }
-                btn.disabled = true;
-            });
-            nextBtn.classList.remove('hidden');
-        } else { // Mock mode
-            Array.from(optionsContainerEl.children).forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
+    if (currentMode === 'practice') {
+        const isCorrect = selectedKey === correctKey;
+        if (isCorrect) {
+            score++;
+            feedbackContainerEl.innerText = 'Correct!';
+            feedbackContainerEl.classList.add('correct');
+        } else {
+            feedbackContainerEl.innerText = `Incorrect. The correct answer is ${correctKey}.`;
+            feedbackContainerEl.classList.add('incorrect');
         }
+        Array.from(optionsContainerEl.children).forEach(btn => {
+            if (btn.dataset.key === correctKey) {
+                btn.classList.add('correct');
+            } else if(btn.dataset.key === selectedKey) {
+                btn.classList.add('incorrect');
+            }
+            btn.disabled = true;
+        });
+        nextBtn.classList.remove('hidden');
+    } else { // Mock mode
+        Array.from(optionsContainerEl.children).forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
     }
+}
     
     function handleNextClick() {
         currentQuestionIndex++;
@@ -1194,56 +1192,58 @@
     }
     
     function showResults() {
-        if(timerInterval) clearInterval(timerInterval);
-        
-        let correctAnswers = 0;
-        activeQuestions.forEach(q => {
-            const correctKey = ['A', 'B', 'C', 'D'][q.correctAnswer];
-            if (q.userAnswer === correctKey) {
-                correctAnswers++;
-            }
-        });
+    if(timerInterval) clearInterval(timerInterval);
+    timerEl.classList.add('hidden');
+    timerEl.style.color = 'var(--primary-color)';
 
-        showScreen(resultsContainer);
-        
-        if (currentMode === 'mock') {
-            const finalScore = correctAnswers * 2;
-            const totalPossibleScore = MOCK_EXAM_QUESTION_COUNT * 2;
-            scoreTextEl.innerText = `Your Score: ${finalScore} / ${totalPossibleScore} (${finalScore}%)`;
-            finalFeedbackEl.innerText = finalScore >= 50 ? "Congratulations, you passed!" : "Keep practicing, you'll get there!";
-        } else {
-            const scorePercent = Math.round((correctAnswers / activeQuestions.length) * 100);
-            scoreTextEl.innerText = `Your Score: ${correctAnswers} out of ${activeQuestions.length} (${scorePercent}%)`;
-            finalFeedbackEl.innerText = scorePercent === 100 ? "Excellent work!" : "Practice complete!";
+    let correctAnswers = 0;
+    activeQuestions.forEach(q => {
+        const correctKey = ['A', 'B', 'C', 'D'][q.correctAnswer];
+        if (q.userAnswer === correctKey) {
+            correctAnswers++;
         }
-        
-        resultsDetailsEl.innerHTML = '';
-        if (currentMode === 'mock') {
-            activeQuestions.forEach((question, index) => {
-                const correctKey = ['A', 'B', 'C', 'D'][question.correctAnswer];
-                const isCorrect = question.userAnswer === correctKey;
-                const resultItem = document.createElement('div');
-                resultItem.classList.add('result-item', isCorrect ? 'result-correct' : 'result-incorrect');
-                
-                let answerDetails = '';
-                if (!isCorrect) {
-                    const userAnswerText = question.userAnswer ? `${question.userAnswer}. ${question.options[['A','B','C','D'].indexOf(question.userAnswer)]}` : 'Not answered';
-                    const correctAnswerText = `${correctKey}. ${question.options[question.correctAnswer]}`;
-                    answerDetails = `
-                        <p>Your answer: <span class="user-answer">${userAnswerText}</span></p>
-                        <p>Correct answer: <span class="correct-answer">${correctAnswerText}</span></p>
-                    `;
-                }
+    });
 
-                resultItem.innerHTML = `
-                    <p><b>Question ${index + 1}: ${isCorrect ? 'Correct' : 'Incorrect'}</b></p>
-                    <p class="result-item-q">${question.questionText}</p>
-                    ${answerDetails}
-                `;
-                resultsDetailsEl.appendChild(resultItem);
-            });
-        }
+    showScreen(resultsContainer);
+    
+    if (currentMode === 'mock') {
+        const finalScore = correctAnswers * 2;
+        const totalPossibleScore = MOCK_EXAM_QUESTION_COUNT * 2;
+        scoreTextEl.innerText = `Your Score: ${finalScore} / ${totalPossibleScore} (${finalScore}%)`;
+        finalFeedbackEl.innerText = finalScore >= 50 ? "Congratulations, you passed!" : "Keep practicing, you'll get there!";
+    } else {
+        const scorePercent = Math.round((correctAnswers / activeQuestions.length) * 100);
+        scoreTextEl.innerText = `Your Score: ${correctAnswers} out of ${activeQuestions.length} (${scorePercent}%)`;
+        finalFeedbackEl.innerText = scorePercent === 100 ? "Excellent work!" : "Practice complete!";
     }
+    
+    resultsDetailsEl.innerHTML = '';
+    if (currentMode === 'mock') {
+        activeQuestions.forEach((question, index) => {
+            const correctKey = ['A', 'B', 'C', 'D'][question.correctAnswer];
+            const isCorrect = question.userAnswer === correctKey;
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('result-item', isCorrect ? 'result-correct' : 'result-incorrect');
+            
+            let answerDetails = '';
+            if (!isCorrect) {
+                const userAnswerText = question.userAnswer ? `${question.userAnswer}. ${question.options[['A','B','C','D'].indexOf(question.userAnswer)]}` : 'Not answered';
+                const correctAnswerText = `${correctKey}. ${question.options[question.correctAnswer]}`;
+                answerDetails = `
+                    <p>Your answer: <span class="user-answer">${userAnswerText}</span></p>
+                    <p>Correct answer: <span class="correct-answer">${correctAnswerText}</span></p>
+                `;
+            }
+
+            resultItem.innerHTML = `
+                <p><b>Question ${index + 1}: ${isCorrect ? 'Correct' : 'Incorrect'}</b></p>
+                <p class="result-item-q">${question.questionText}</p>
+                ${answerDetails}
+            `;
+            resultsDetailsEl.appendChild(resultItem);
+        });
+    }
+}```
 
     // Initial load
     showMenu();
