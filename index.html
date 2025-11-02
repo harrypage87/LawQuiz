@@ -30,7 +30,7 @@
         .container {
             background-color: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 800px;
             overflow: hidden;
@@ -53,19 +53,57 @@
         .hidden {
             display: none;
         }
-        /* --- Menu & Chapter Select --- */
-        .menu-container h2, .chapter-select-container h2 {
+        
+        /* --- Facelift Styles for Main Menu --- */
+        .hero-section {
+            background-color: var(--primary-color);
+            color: white;
             text-align: center;
-            margin-bottom: 25px;
-            color: var(--primary-color);
+            padding: 40px 20px;
         }
-        .btn-container {
+        .hero-section h2 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+        }
+        .hero-section p {
+            margin: 0;
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .menu-options {
+            display: flex;
+            gap: 20px;
+            padding: 30px;
+        }
+        .menu-option {
+            flex: 1;
+            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            align-items: center;
         }
-        .btn, .chapter-btn {
-            padding: 18px;
+        .menu-option svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        .menu-option h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+            color: var(--primary-color);
+        }
+        .menu-option p {
+            margin: 0 0 20px 0;
+            color: #666;
+            flex-grow: 1;
+        }
+        .btn {
+            padding: 15px;
             font-size: 1.1em;
             font-weight: bold;
             color: white;
@@ -74,58 +112,42 @@
             border-radius: 8px;
             cursor: pointer;
             text-align: center;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .btn:hover, .chapter-btn:hover {
+        .btn:hover {
             background-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        .chapter-btn {
-            background-color: #f9f9f9;
-            color: var(--primary-color);
-            border: 1px solid var(--border-color);
-        }
-         .chapter-btn:hover {
-            background-color: #e9e9e9;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
+        @media (max-width: 600px) {
+            .menu-options {
+                flex-direction: column;
+            }
         }
 
-        /* --- Quiz Screen --- */
-        #quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        /* --- Chapter Select --- */
+        .chapter-select-container h2 { text-align: center; margin-bottom: 25px; color: var(--primary-color); }
+        .btn-container { display: flex; flex-direction: column; gap: 15px; }
+        .chapter-btn {
+            padding: 18px; font-size: 1.1em; font-weight: bold;
+            background-color: #fff; color: var(--primary-color);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            cursor: pointer; text-align: center; transition: background-color 0.2s;
         }
-        #question-number {
-            font-size: 0.9em;
-            font-weight: bold;
-            color: #555;
-        }
-        #timer {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--primary-color);
-            background-color: #e9ecef;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        #question-text {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            line-height: 1.5;
-        }
-        .option-btn {
-            display: block; width: 100%; padding: 15px; font-size: 1em; text-align: left;
-            background-color: #f9f9f9; border: 1px solid var(--border-color);
-            border-radius: 8px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s;
-            margin-bottom: 10px;
-        }
+        .chapter-btn:hover { background-color: #f0f2f5; }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #c82333; }
+
+        /* --- Quiz & Results Screens --- */
+        #quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        #question-number { font-size: 0.9em; font-weight: bold; color: #555; }
+        #timer { font-size: 1.2em; font-weight: bold; color: var(--primary-color); background-color: #e9ecef; padding: 5px 10px; border-radius: 5px; }
+        #question-text { font-size: 1.2em; margin-bottom: 20px; white-space: pre-wrap; line-height: 1.5; }
+        .option-btn { display: block; width: 100%; padding: 15px; font-size: 1em; text-align: left; background-color: #f9f9f9; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; margin-bottom: 10px; }
         .option-btn:hover:not(:disabled) { background-color: #e9e9e9; border-color: var(--primary-color); }
         .option-btn:disabled { cursor: not-allowed; }
         .option-btn.correct { background-color: var(--correct-bg); border-color: #c3e6cb; color: var(--correct-text); font-weight: bold; }
@@ -134,16 +156,8 @@
         #feedback-container { margin-top: 15px; font-size: 1.1em; font-weight: bold; padding: 10px; border-radius: 5px; }
         #feedback-container.correct { color: var(--correct-text); }
         #feedback-container.incorrect { color: var(--incorrect-text); }
-        #quiz-footer-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        #quiz-footer-buttons .btn {
-            flex: 1;
-        }
-
-        /* --- Results Screen --- */
+        #quiz-footer-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        #quiz-footer-buttons .btn { flex: 1; }
         #results-container h2 { text-align: center; color: var(--primary-color); }
         #score-text { text-align: center; font-size: 1.4em; font-weight: bold; margin-bottom: 10px; }
         #final-feedback { text-align: center; font-size: 1.1em; margin-bottom: 30px; }
@@ -160,16 +174,30 @@
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>Law for Accountants Toolkit Practice</h1>
-    </div>
-
     <!-- Main Menu Screen -->
-    <div id="menu-container" class="main-content">
-        <h2>Choose Your Mode</h2>
-        <div class="btn-container">
-            <button id="practice-btn" class="btn">Practice Questions</button>
-            <button id="mock-exam-btn" class="btn">Mock Exam</button>
+    <div id="menu-container">
+        <div class="hero-section">
+            <h2>Law for Accountants Toolkit</h2>
+            <p>Your interactive study tool for the CA Proficiency 1 exam.</p>
+        </div>
+        <div class="menu-options">
+            <div class="menu-option">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-book-half" viewBox="0 0 16 16">
+                    <path d="M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388 1.175.885.653 1.454 1.513 1.454 2.52 0 1.06-.615 2.04-1.505 2.634-1.088.707-2.333.958-3.59 1.034-1.257.076-2.44.03-3.55-.13a.5.5 0 0 0-.49.25l-.22.34H8.5v-13a.5.5 0 0 1 .5-.5zM8 1.5a.5.5 0 0 0-.5.5V14a.5.5 0 0 0 .5.5h.5a.5.5 0 0 0 .5-.5V2a.5.5 0 0 0-.5-.5H8zM7.5 15a.5.5 0 0 0-.5-.5H2a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 0 0-1H2C.9 1 0 1.9 0 3v10c0 1.1.9 2 2 2h5.5a.5.5 0 0 0 .5-.5z"/>
+                </svg>
+                <h3>Practice Questions</h3>
+                <p>Study chapter by chapter with instant feedback after every question.</p>
+                <button id="practice-btn" class="btn">Start Practice</button>
+            </div>
+            <div class="menu-option">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-stopwatch" viewBox="0 0 16 16">
+                    <path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5z"/>
+                    <path d="M6.5 1A.5.5 0 0 1 7 .5h2a.5.5 0 0 1 0 1v.57c1.36.196 2.594.78 3.584 1.64a.715.715 0 0 1 .012-.013l.354-.354-.354-.353a.5.5 0 0 1 .707-.708l1.414 1.415a.5.5 0 1 1-.707.707l-.353-.354-.354.354a.512.512 0 0 1-.013.012A7 7 0 1 1 7 2.071V1.5a.5.5 0 0 1-.5-.5zM8 3a6 6 0 1 0 .001 12A6 6 0 0 0 8 3z"/>
+                </svg>
+                <h3>Mock Exam</h3>
+                <p>A timed, 50-question exam simulation. Results are shown at the end.</p>
+                <button id="mock-exam-btn" class="btn">Start Mock Exam</button>
+            </div>
         </div>
     </div>
 
@@ -204,6 +232,8 @@
         <button id="menu-return-btn" class="btn">Back to Main Menu</button>
     </div>
 </div>
+
+
 
 <script>
     const quizData = [
@@ -959,7 +989,7 @@
     
     ];
     
-    // --- APP LOGIC (No changes needed here) ---
+// --- APP LOGIC ---
     const MOCK_EXAM_QUESTION_COUNT = 50;
     const MOCK_EXAM_DURATION_MINUTES = 90;
 
@@ -989,13 +1019,37 @@
     document.getElementById('mock-exam-btn').addEventListener('click', startMockExam);
     document.getElementById('back-to-menu-btn').addEventListener('click', showMenu);
     document.getElementById('menu-return-btn').addEventListener('click', showMenu);
+    nextBtn.addEventListener('click', handleNextClick);
+
+    // --- Corrected Quit Button Logic ---
+    let isConfirmingQuit = false;
+    let quitConfirmTimeout;
+
+    function resetQuitButtonState() {
+        isConfirmingQuit = false;
+        quitBtn.innerText = 'Main Menu';
+        quitBtn.classList.remove('btn-danger');
+        clearTimeout(quitConfirmTimeout);
+    }
+
     quitBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to quit? Your progress will be lost.')) {
+        if (isConfirmingQuit) {
+            // This is the second click, so quit.
             if(timerInterval) clearInterval(timerInterval);
             showMenu();
+        } else {
+            // This is the first click, so ask for confirmation.
+            isConfirmingQuit = true;
+            quitBtn.innerText = 'Are you sure?';
+            quitBtn.classList.add('btn-danger');
+
+            // Set a timer to reset the button after 3 seconds
+            quitConfirmTimeout = setTimeout(() => {
+                resetQuitButtonState();
+            }, 3000);
         }
     });
-    nextBtn.addEventListener('click', handleNextClick);
+    // --- End of Corrected Quit Button Logic ---
 
     function showScreen(screen) {
         [menuContainer, chapterSelectContainer, quizContainer, resultsContainer].forEach(container => {
@@ -1006,9 +1060,9 @@
 
     function showMenu() {
         showScreen(menuContainer);
-        // Reset timer styles just in case
         timerEl.classList.add('hidden');
         timerEl.style.color = 'var(--primary-color)';
+        resetQuitButtonState(); // Reset quit button when returning to menu
     }
 
     function showChapterSelection() {
@@ -1054,16 +1108,17 @@
         questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
         questionTextEl.innerText = question.questionText;
 
-        for (const [key, value] of Object.entries(question.options)) {
+        // Create option buttons from the new data structure
+        const optionLabels = ['A', 'B', 'C', 'D'];
+        question.options.forEach((optionText, index) => {
+            const key = optionLabels[index];
             const button = document.createElement('button');
-            // For split questions, we want the button text to just be the value
-            const buttonText = (value.startsWith('A.') || value.startsWith('B.') || value.startsWith('C.') || value.startsWith('D.')) ? value : `${key}. ${value}`;
-            button.innerText = buttonText;
+            button.innerText = `${key}. ${optionText}`;
             button.classList.add('option-btn');
             button.dataset.key = key;
             button.addEventListener('click', () => handleAnswer(key, button));
             optionsContainerEl.appendChild(button);
-        }
+        });
         
         if (currentMode === 'mock') {
             nextBtn.classList.remove('hidden');
@@ -1078,20 +1133,21 @@
     }
 
     function handleAnswer(selectedKey, button) {
+        const correctKey = ['A', 'B', 'C', 'D'][activeQuestions[currentQuestionIndex].correctAnswer];
         activeQuestions[currentQuestionIndex].userAnswer = selectedKey;
 
         if (currentMode === 'practice') {
-            const isCorrect = selectedKey === activeQuestions[currentQuestionIndex].correctAnswer;
+            const isCorrect = selectedKey === correctKey;
             if (isCorrect) {
                 score++;
                 feedbackContainerEl.innerText = 'Correct!';
                 feedbackContainerEl.classList.add('correct');
             } else {
-                feedbackContainerEl.innerText = `Incorrect. The correct answer is ${activeQuestions[currentQuestionIndex].correctAnswer}.`;
+                feedbackContainerEl.innerText = `Incorrect. The correct answer is ${correctKey}.`;
                 feedbackContainerEl.classList.add('incorrect');
             }
             Array.from(optionsContainerEl.children).forEach(btn => {
-                if (btn.dataset.key === activeQuestions[currentQuestionIndex].correctAnswer) {
+                if (btn.dataset.key === correctKey) {
                     btn.classList.add('correct');
                 } else if(btn.dataset.key === selectedKey) {
                     btn.classList.add('incorrect');
@@ -1140,30 +1196,39 @@
     function showResults() {
         if(timerInterval) clearInterval(timerInterval);
         
-        if(currentMode === 'mock') {
-            score = 0;
-            activeQuestions.forEach(q => {
-                if(q.userAnswer === q.correctAnswer) score++;
-            });
-        }
-        
+        let correctAnswers = 0;
+        activeQuestions.forEach(q => {
+            const correctKey = ['A', 'B', 'C', 'D'][q.correctAnswer];
+            if (q.userAnswer === correctKey) {
+                correctAnswers++;
+            }
+        });
+
         showScreen(resultsContainer);
         
-        const scorePercent = Math.round((score / activeQuestions.length) * 100);
-        scoreTextEl.innerText = `Your Score: ${score} out of ${activeQuestions.length} (${scorePercent}%)`;
-        finalFeedbackEl.innerText = scorePercent >= 50 ? "Congratulations, you passed!" : "Keep practicing, you'll get there!";
+        if (currentMode === 'mock') {
+            const finalScore = correctAnswers * 2;
+            const totalPossibleScore = MOCK_EXAM_QUESTION_COUNT * 2;
+            scoreTextEl.innerText = `Your Score: ${finalScore} / ${totalPossibleScore} (${finalScore}%)`;
+            finalFeedbackEl.innerText = finalScore >= 50 ? "Congratulations, you passed!" : "Keep practicing, you'll get there!";
+        } else {
+            const scorePercent = Math.round((correctAnswers / activeQuestions.length) * 100);
+            scoreTextEl.innerText = `Your Score: ${correctAnswers} out of ${activeQuestions.length} (${scorePercent}%)`;
+            finalFeedbackEl.innerText = scorePercent === 100 ? "Excellent work!" : "Practice complete!";
+        }
         
         resultsDetailsEl.innerHTML = '';
         if (currentMode === 'mock') {
             activeQuestions.forEach((question, index) => {
-                const isCorrect = question.userAnswer === question.correctAnswer;
+                const correctKey = ['A', 'B', 'C', 'D'][question.correctAnswer];
+                const isCorrect = question.userAnswer === correctKey;
                 const resultItem = document.createElement('div');
                 resultItem.classList.add('result-item', isCorrect ? 'result-correct' : 'result-incorrect');
                 
                 let answerDetails = '';
                 if (!isCorrect) {
-                    const userAnswerText = question.userAnswer ? `${question.userAnswer}. ${question.options[question.userAnswer]}` : 'Not answered';
-                    const correctAnswerText = `${question.correctAnswer}. ${question.options[question.correctAnswer]}`;
+                    const userAnswerText = question.userAnswer ? `${question.userAnswer}. ${question.options[['A','B','C','D'].indexOf(question.userAnswer)]}` : 'Not answered';
+                    const correctAnswerText = `${correctKey}. ${question.options[question.correctAnswer]}`;
                     answerDetails = `
                         <p>Your answer: <span class="user-answer">${userAnswerText}</span></p>
                         <p>Correct answer: <span class="correct-answer">${correctAnswerText}</span></p>
