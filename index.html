@@ -54,7 +54,7 @@
             display: none;
         }
         
-        /* --- Facelift Styles for Main Menu --- */
+        
         .hero-section {
             background-color: var(--primary-color);
             color: white;
@@ -127,7 +127,7 @@
             }
         }
 
-        /* --- Chapter Select --- */
+        
         .chapter-select-container h2 { text-align: center; margin-bottom: 25px; color: var(--primary-color); }
         .btn-container { display: flex; flex-direction: column; gap: 15px; }
         .chapter-btn {
@@ -142,7 +142,7 @@
         .btn-danger { background-color: #dc3545; }
         .btn-danger:hover { background-color: #c82333; }
 
-        /* --- Quiz & Results Screens --- */
+        
         #quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         #question-number { font-size: 0.9em; font-weight: bold; color: #555; }
         #timer { font-size: 1.2em; font-weight: bold; color: var(--primary-color); background-color: #e9ecef; padding: 5px 10px; border-radius: 5px; }
@@ -237,7 +237,7 @@
 
 <script>
     const quizData = [
-        // --- Chapter 1 Data ---
+        
         { section: "1. Introduction to Law", id: 1, questionText: "Which two of the following terms are associated with current criminal law in Ireland?\n(1) Community Service\n(2) Pleadings\n(3) The Attorney General\n(4) Rehabilitation", options: { A: "(1) and (2)", B: "(1) and (4)", C: "(2) and (3)", D: "(3) and (4)" }, correctAnswer: "B" },
         { section: "1. Introduction to Law", id: 2, questionText: "Which two of the following terms are associated with civil law in Ireland?\n(1) Pleadings\n(2) Injunctions\n(3) Probation orders\n(4) Indictment", options: { A: "(1) and (2)", B: "(2) and (3)", C: "(3) and (4)", D: "(1) and (4)" }, correctAnswer: "A" },
         { section: "1. Introduction to Law", id: 3, questionText: "Which one of the following describes the burden of proof in civil law matters?", options: { A: "The burden is the balance of probabilities", B: "The burden lies on the prosecution", C: "The burden lies with the plaintiff/claimant", D: "The burden is tested based on a belief beyond all reasonable doubt" }, correctAnswer: "C" },
@@ -299,7 +299,7 @@
         { section: "1. Introduction to Law", id: 59, questionText: "Which one of the following is not an advantage of referring a dispute to arbitration versus bringing proceedings before a traditional court?", options: { A: "Both parties share the costs of the arbitrator and the venue", B: "The arbitrator is usually an expert in the subject matter of the dispute", C: "Arbitration hearings are usually held in private", D: "Arbitration hearings are normally more time efficient" }, correctAnswer: "A" },
         
         
-        // --- Chapter 2: Company Law (Full & Corrected) ---
+        
         { section: "2.1 Formation of Companies", id: 60, questionText: "In some cases, the court lifts the ‘corporate veil’, for example, to ignore the incorporated nature of a business altogether in those cases where it appears to be nothing but a sham. Are the courts likely to lift the corporate veil in the following situations?  \n\nWhere a company is registered in Ireland but all its members, except one, are nationals and reside in New Zealand. The company was registered in Ireland as a film production company and has applied to the Irish Government for a grant, which is only given to Irish companies. The company has five members with equal shareholdings.", options: { A: "Yes", B: "No"}, correctAnswer: "A" },
         { section: "2.1 Formation of Companies", id: 61, questionText: "In some cases, the court lifts the ‘corporate veil’, for example, to ignore the incorporated nature of a business altogether in those cases where it appears to be nothing but a sham. Are the courts likely to lift the corporate veil in the following situations?  \n\nWhere the creditors of an insolvent subsidiary company are unlikely to receive settlement of their debts as all the assets of the subsidiary were transferred to the holding company in the six months prior to its liquidation?", options: { A: "Yes", B: "No"}, correctAnswer: "A" },
         { section: "2.1 Formation of Companies", id: 62, questionText: "Are the following statements true or false?  \n\nA company is always liable without limit for its own debts.", options: { A: "True", B: "False"}, correctAnswer: "A" },
@@ -985,11 +985,11 @@
         { section: "3.6 Industry-Specific Legislation", id: 741, questionText: "Regarding the regulation of Chartered Accountants Ireland, are the following statements true or false?  \n\nHearings before the Disciplinary Tribunal and Appeals Tribunal are generally held in private.", options: { A: "True", B: "False"}, correctAnswer: "B" },
         { section: "3.6 Industry-Specific Legislation", id: 742, questionText: "Regarding the regulation of Chartered Accountants Ireland, are the following statements true or false?  \n\nSanctions can be imposed without convening a sitting of the Disciplinary Tribunal where the member consents to the imposition of an expulsion or suspension order.", options: { A: "True", B: "False"}, correctAnswer: "A" }
         
-        // --- END: COMPLETE CHAPTER 3 QUESTION DATA ---
+        
     
     ];
     
-    // --- APP LOGIC (CORRECTED) ---
+    
     const MOCK_EXAM_QUESTION_COUNT = 50;
     const MOCK_EXAM_DURATION_MINUTES = 90;
 
