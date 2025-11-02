@@ -989,7 +989,7 @@
     
     ];
     
-    // --- APP LOGIC ---
+    // --- APP LOGIC (CORRECTED) ---
     const MOCK_EXAM_QUESTION_COUNT = 50;
     const MOCK_EXAM_DURATION_MINUTES = 90;
 
@@ -1100,16 +1100,14 @@
         questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
         questionTextEl.innerText = question.questionText;
 
-        const optionLabels = ['A', 'B', 'C', 'D'];
-        question.options.forEach((optionText, index) => {
-            const key = optionLabels[index];
+        for (const [key, value] of Object.entries(question.options)) {
             const button = document.createElement('button');
-            button.innerText = `${key}. ${optionText}`;
+            button.innerText = `${key}. ${value}`;
             button.classList.add('option-btn');
             button.dataset.key = key;
             button.addEventListener('click', () => handleAnswer(key, button));
             optionsContainerEl.appendChild(button);
-        });
+        }
         
         if (currentMode === 'mock') {
             nextBtn.classList.remove('hidden');
@@ -1124,7 +1122,7 @@
     }
 
     function handleAnswer(selectedKey, button) {
-        const correctKey = ['A', 'B', 'C', 'D'][activeQuestions[currentQuestionIndex].correctAnswer];
+        const correctKey = activeQuestions[currentQuestionIndex].correctAnswer;
         activeQuestions[currentQuestionIndex].userAnswer = selectedKey;
 
         if (currentMode === 'practice') {
@@ -1189,8 +1187,7 @@
         
         let correctAnswers = 0;
         activeQuestions.forEach(q => {
-            const correctKey = ['A', 'B', 'C', 'D'][q.correctAnswer];
-            if (q.userAnswer === correctKey) {
+            if (q.userAnswer === q.correctAnswer) {
                 correctAnswers++;
             }
         });
@@ -1211,15 +1208,14 @@
         resultsDetailsEl.innerHTML = '';
         if (currentMode === 'mock') {
             activeQuestions.forEach((question, index) => {
-                const correctKey = ['A', 'B', 'C', 'D'][question.correctAnswer];
-                const isCorrect = question.userAnswer === correctKey;
+                const isCorrect = question.userAnswer === question.correctAnswer;
                 const resultItem = document.createElement('div');
                 resultItem.classList.add('result-item', isCorrect ? 'result-correct' : 'result-incorrect');
                 
                 let answerDetails = '';
                 if (!isCorrect) {
-                    const userAnswerText = question.userAnswer ? `${question.userAnswer}. ${question.options[['A','B','C','D'].indexOf(question.userAnswer)]}` : 'Not answered';
-                    const correctAnswerText = `${correctKey}. ${question.options[question.correctAnswer]}`;
+                    const userAnswerText = question.userAnswer ? `${question.userAnswer}. ${question.options[question.userAnswer]}` : 'Not answered';
+                    const correctAnswerText = `${question.correctAnswer}. ${question.options[question.correctAnswer]}`;
                     answerDetails = `
                         <p>Your answer: <span class="user-answer">${userAnswerText}</span></p>
                         <p>Correct answer: <span class="correct-answer">${correctAnswerText}</span></p>
@@ -1239,6 +1235,3 @@
     // Initial load
     showMenu();
 </script>
-
-</body>
-</html>
