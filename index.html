@@ -127,25 +127,77 @@
             }
         }
 
-        
+
         .chapter-select-container h2 { text-align: center; margin-bottom: 25px; color: var(--primary-color); }
         .btn-container { display: flex; flex-direction: column; gap: 15px; }
-        .chapter-btn {
-            padding: 18px; font-size: 1.1em; font-weight: bold;
-            background-color: #fff; color: var(--primary-color);
-            border: 1px solid var(--border-color); border-radius: 8px;
-            cursor: pointer; text-align: center; transition: background-color 0.2s;
+        .chapter-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fff;
         }
-        .chapter-btn:hover { background-color: #f0f2f5; }
+        .chapter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .chapter-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .wrong-count {
+            background-color: var(--incorrect-bg);
+            color: var(--incorrect-text);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .chapter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .chapter-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 1em;
+            font-weight: bold;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .chapter-btn:hover { background-color: var(--primary-color); }
+        .chapter-btn.review-btn {
+            background-color: #dc3545;
+        }
+        .chapter-btn.review-btn:hover {
+            background-color: #c82333;
+        }
         .btn-secondary { background-color: #6c757d; }
         .btn-secondary:hover { background-color: #5a6268; }
         .btn-danger { background-color: #dc3545; }
         .btn-danger:hover { background-color: #c82333; }
 
-        
+
         #quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         #question-number { font-size: 0.9em; font-weight: bold; color: #555; }
         #timer { font-size: 1.2em; font-weight: bold; color: var(--primary-color); background-color: #e9ecef; padding: 5px 10px; border-radius: 5px; }
+        .previously-wrong-badge {
+            display: inline-block;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border: 1px solid #ffc107;
+        }
         #question-text { font-size: 1.2em; margin-bottom: 20px; white-space: pre-wrap; line-height: 1.5; }
         .option-btn { display: block; width: 100%; padding: 15px; font-size: 1em; text-align: left; background-color: #f9f9f9; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; margin-bottom: 10px; }
         .option-btn:hover:not(:disabled) { background-color: #e9e9e9; border-color: var(--primary-color); }
@@ -998,6 +1050,7 @@
     let score = 0;
     let activeQuestions = [];
     let timerInterval;
+    let reviewWrongAnswersMode = false;
 
     const menuContainer = document.getElementById('menu-container');
     const chapterSelectContainer = document.getElementById('chapter-select-container');
@@ -1014,6 +1067,86 @@
     const scoreTextEl = document.getElementById('score-text');
     const finalFeedbackEl = document.getElementById('final-feedback');
     const resultsDetailsEl = document.getElementById('results-details');
+
+    // ==================== LOCAL STORAGE MANAGEMENT ====================
+
+    function loadQuestionStats() {
+        const stored = localStorage.getItem('lawQuizStats');
+        return stored ? JSON.parse(stored) : { questionStats: {}, sessionHistory: [] };
+    }
+
+    function saveQuestionStats(stats) {
+        localStorage.setItem('lawQuizStats', JSON.stringify(stats));
+    }
+
+    function updateQuestionStat(questionId, section, isCorrect) {
+        const stats = loadQuestionStats();
+
+        if (!stats.questionStats[questionId]) {
+            stats.questionStats[questionId] = {
+                id: questionId,
+                section: section,
+                timesAttempted: 0,
+                timesCorrect: 0,
+                timesWrong: 0,
+                lastAttemptDate: null,
+                isWrong: false
+            };
+        }
+
+        const qStat = stats.questionStats[questionId];
+        qStat.timesAttempted++;
+        qStat.lastAttemptDate = new Date().toISOString();
+
+        if (isCorrect) {
+            qStat.timesCorrect++;
+            // Question is no longer marked as wrong if answered correctly
+            qStat.isWrong = false;
+        } else {
+            qStat.timesWrong++;
+            qStat.isWrong = true;
+        }
+
+        saveQuestionStats(stats);
+        return stats;
+    }
+
+    function getWrongQuestionsBySection(section) {
+        const stats = loadQuestionStats();
+        const wrongIds = [];
+
+        for (const [id, qStat] of Object.entries(stats.questionStats)) {
+            if (qStat.section === section && qStat.isWrong) {
+                wrongIds.push(parseInt(id));
+            }
+        }
+
+        return wrongIds;
+    }
+
+    function getWrongAnswerCountBySection(section) {
+        return getWrongQuestionsBySection(section).length;
+    }
+
+    function saveSessionHistory(mode, section, score, total, reviewMode = false) {
+        const stats = loadQuestionStats();
+        stats.sessionHistory.push({
+            date: new Date().toISOString(),
+            mode: mode,
+            section: section || 'Mock Exam',
+            score: score,
+            total: total,
+            reviewMode: reviewMode
+        });
+        saveQuestionStats(stats);
+    }
+
+    function isQuestionPreviouslyWrong(questionId) {
+        const stats = loadQuestionStats();
+        return stats.questionStats[questionId]?.isWrong || false;
+    }
+
+    // ==================== END LOCAL STORAGE MANAGEMENT ====================
 
     document.getElementById('practice-btn').addEventListener('click', showChapterSelection);
     document.getElementById('mock-exam-btn').addEventListener('click', startMockExam);
@@ -1055,29 +1188,88 @@
         timerEl.classList.add('hidden');
         timerEl.style.color = 'var(--primary-color)';
         resetQuitButtonState();
+        reviewWrongAnswersMode = false;
     }
 
     function showChapterSelection() {
         chapterListEl.innerHTML = '';
         const chapters = [...new Set(quizData.map(q => q.section))];
+
         chapters.forEach(chapter => {
-            const button = document.createElement('button');
-            button.innerText = chapter;
-            button.classList.add('chapter-btn');
-            button.addEventListener('click', () => startPractice(chapter));
-            chapterListEl.appendChild(button);
+            const wrongCount = getWrongAnswerCountBySection(chapter);
+
+            // Create chapter item container
+            const chapterItem = document.createElement('div');
+            chapterItem.classList.add('chapter-item');
+
+            // Create header with title and wrong count badge
+            const header = document.createElement('div');
+            header.classList.add('chapter-header');
+
+            const title = document.createElement('div');
+            title.classList.add('chapter-title');
+            title.innerText = chapter;
+            header.appendChild(title);
+
+            if (wrongCount > 0) {
+                const badge = document.createElement('span');
+                badge.classList.add('wrong-count');
+                badge.innerText = `${wrongCount} to review`;
+                header.appendChild(badge);
+            }
+
+            chapterItem.appendChild(header);
+
+            // Create buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.classList.add('chapter-buttons');
+
+            // Practice All button
+            const practiceBtn = document.createElement('button');
+            practiceBtn.innerText = 'Practice All';
+            practiceBtn.classList.add('chapter-btn');
+            practiceBtn.addEventListener('click', () => startPractice(chapter, false));
+            buttonsContainer.appendChild(practiceBtn);
+
+            // Review Wrong Answers button (only if there are wrong answers)
+            if (wrongCount > 0) {
+                const reviewBtn = document.createElement('button');
+                reviewBtn.innerText = 'Review Wrong Answers';
+                reviewBtn.classList.add('chapter-btn', 'review-btn');
+                reviewBtn.addEventListener('click', () => startPractice(chapter, true));
+                buttonsContainer.appendChild(reviewBtn);
+            }
+
+            chapterItem.appendChild(buttonsContainer);
+            chapterListEl.appendChild(chapterItem);
         });
+
         showScreen(chapterSelectContainer);
     }
 
-    function startPractice(chapterName) {
+    function startPractice(chapterName, reviewMode = false) {
         currentMode = 'practice';
-        const chapterQuestions = quizData.filter(q => q.section === chapterName);
+        reviewWrongAnswersMode = reviewMode;
+
+        let chapterQuestions = quizData.filter(q => q.section === chapterName);
+
+        if (reviewMode) {
+            // Filter to only show questions that were previously answered incorrectly
+            const wrongIds = getWrongQuestionsBySection(chapterName);
+            chapterQuestions = chapterQuestions.filter(q => wrongIds.includes(q.id));
+        }
+
+        if (chapterQuestions.length === 0) {
+            alert('No questions available for review. Great job!');
+            return;
+        }
+
         startQuiz(chapterQuestions);
     }
 
     function startMockExam() {
         currentMode = 'mock';
+        reviewWrongAnswersMode = false;
         const shuffled = [...quizData].sort(() => 0.5 - Math.random());
         const questionCount = Math.min(MOCK_EXAM_QUESTION_COUNT, shuffled.length);
         const mockQuestions = shuffled.slice(0, questionCount);
@@ -1096,9 +1288,21 @@
     function displayQuestion() {
         resetQuestionState();
         const question = activeQuestions[currentQuestionIndex];
-        
+
         questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${activeQuestions.length}`;
-        questionTextEl.innerText = question.questionText;
+
+        // Show badge if this question was previously answered incorrectly
+        if (isQuestionPreviouslyWrong(question.id) && !reviewWrongAnswersMode) {
+            const badge = document.createElement('div');
+            badge.classList.add('previously-wrong-badge');
+            badge.innerText = '⚠️ Previously answered incorrectly';
+            questionTextEl.innerHTML = '';
+            questionTextEl.appendChild(badge);
+            const textNode = document.createTextNode(question.questionText);
+            questionTextEl.appendChild(textNode);
+        } else {
+            questionTextEl.innerText = question.questionText;
+        }
 
         for (const [key, value] of Object.entries(question.options)) {
             const button = document.createElement('button');
@@ -1108,7 +1312,7 @@
             button.addEventListener('click', () => handleAnswer(key, button));
             optionsContainerEl.appendChild(button);
         }
-        
+
         if (currentMode === 'mock') {
             nextBtn.classList.remove('hidden');
         }
@@ -1122,11 +1326,16 @@
     }
 
     function handleAnswer(selectedKey, button) {
-        const correctKey = activeQuestions[currentQuestionIndex].correctAnswer;
-        activeQuestions[currentQuestionIndex].userAnswer = selectedKey;
+        const currentQuestion = activeQuestions[currentQuestionIndex];
+        const correctKey = currentQuestion.correctAnswer;
+        currentQuestion.userAnswer = selectedKey;
 
         if (currentMode === 'practice') {
             const isCorrect = selectedKey === correctKey;
+
+            // Update localStorage stats
+            updateQuestionStat(currentQuestion.id, currentQuestion.section, isCorrect);
+
             if (isCorrect) {
                 score++;
                 feedbackContainerEl.innerText = 'Correct!';
@@ -1184,7 +1393,7 @@
     
     function showResults() {
         if(timerInterval) clearInterval(timerInterval);
-        
+
         let correctAnswers = 0;
         activeQuestions.forEach(q => {
             if (q.userAnswer === q.correctAnswer) {
@@ -1192,8 +1401,12 @@
             }
         });
 
+        // Save session history
+        const sectionName = activeQuestions.length > 0 ? activeQuestions[0].section : null;
+        saveSessionHistory(currentMode, sectionName, correctAnswers, activeQuestions.length, reviewWrongAnswersMode);
+
         showScreen(resultsContainer);
-        
+
         if (currentMode === 'mock') {
             const finalScore = correctAnswers * 2;
             const totalPossibleScore = MOCK_EXAM_QUESTION_COUNT * 2;
